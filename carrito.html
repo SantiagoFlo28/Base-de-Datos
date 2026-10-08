@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff">
+  <meta name="description" content="Revisa tu carrito de compras de Monochrome TCG.">
+  <title>Carrito | Monochrome TCG</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script>if(!sessionStorage.getItem('monochromeUser')){sessionStorage.setItem('monochromeNext','carrito.html');location.replace('login.html?next=carrito.html');}</script>
+</head>
+<body>
+  <header class="site-header shop-header">
+    <a class="wordmark" href="index.html" aria-label="Monochrome TCG, inicio"><span class="brand-mark">M</span><span>Monochrome <span class="wordmark-light">TCG</span></span></a>
+    <nav class="shop-nav" aria-label="Navegación principal"><a href="index.html">Inicio</a><a href="tienda.html">Producto</a><a class="cart-count current" href="carrito.html">Carrito <span id="header-count">0</span></a><a class="header-login" href="login.html">Mi cuenta <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main class="flow-main">
+    <div class="breadcrumb"><a href="index.html">Inicio</a><span>/</span><span>Carrito</span></div>
+    <section class="flow-heading"><span class="eyebrow">TU SELECCIÓN</span><h1>Carrito<span class="period">.</span></h1><p>Revisa tu producto antes de continuar al pago.</p></section>
+    <div id="cart-content"></div>
+  </main>
+  <footer class="site-footer"><span>MONOCHROME TCG</span><span>Una tienda para fans y coleccionistas.</span><span>© 2026</span></footer>
+  <script>
+    const quantity = Number(sessionStorage.getItem('monochromeCart') || '0');
+    const count = document.getElementById('header-count');
+    const content = document.getElementById('cart-content');
+    count.textContent = quantity;
+    if (quantity < 1) {
+      content.innerHTML = '<section class="empty-cart"><span class="empty-mark">○</span><h2>Tu carrito está vacío.</h2><p>Explora el producto y agrégalo para continuar.</p><a class="button button-dark" href="tienda.html">Ver producto <span>↗</span></a></section>';
+    } else {
+      let currentQuantity = quantity;
+      const subtotal = (1799 * quantity).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+      content.innerHTML = `<section class="cart-layout"><div class="cart-items"><article class="cart-item"><img src="img/producto.jpg" alt="Pokémon TCG: 30TH Celebration Elite Trainer Box"><div class="cart-item-info"><span class="eyebrow">POKÉMON TCG</span><h2>30TH Celebration Elite Trainer Box</h2><p>Caja de Entrenador Élite · Edición de aniversario</p><label for="quantity">Cantidad</label><div class="quantity-control"><button type="button" id="decrease" aria-label="Quitar una unidad">−</button><output id="quantity">${quantity}</output><button type="button" id="increase" aria-label="Agregar una unidad">+</button></div></div><strong class="cart-line-price">$${subtotal} <small>MXN</small></strong></article><a class="back-to-shop" href="tienda.html">← Seguir viendo el producto</a></div><aside class="order-summary"><span class="eyebrow">RESUMEN</span><h2>Tu pedido</h2><div><span>Producto</span><span>$1,799.00</span></div><div><span>Cantidad</span><span id="summary-quantity">${quantity}</span></div><div class="summary-total"><strong>Subtotal</strong><strong id="summary-total">$${subtotal} MXN</strong></div><p>El envío se calculará en el siguiente paso.</p><a class="button button-dark checkout-link" href="pago.html">Continuar al pago <span>↗</span></a></aside></section>`;
+      const setQuantity = next => {
+        const updated = Math.max(0, next);
+        sessionStorage.setItem('monochromeCart', String(updated));
+        if (updated === 0) { location.reload(); return; }
+        currentQuantity = updated;
+        const total = (1799 * updated).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('quantity').textContent = updated;
+        document.getElementById('summary-quantity').textContent = updated;
+        document.getElementById('header-count').textContent = updated;
+        document.getElementById('summary-total').textContent = `$${total} MXN`;
+        document.querySelector('.cart-line-price').innerHTML = `$${total} <small>MXN</small>`;
+      };
+      document.getElementById('decrease').addEventListener('click', () => setQuantity(currentQuantity - 1));
+      document.getElementById('increase').addEventListener('click', () => setQuantity(currentQuantity + 1));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff">
+  <meta name="description" content="Dirección y método de pago para tu pedido de Monochrome TCG.">
+  <title>Pago | Monochrome TCG</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script>if(!sessionStorage.getItem('monochromeUser')){sessionStorage.setItem('monochromeNext','pago.html');location.replace('login.html?next=pago.html');}else if(Number(sessionStorage.getItem('monochromeCart')||'0')<1){location.replace('carrito.html');}</script>
+</head>
+<body>
+  <header class="site-header shop-header">
+    <a class="wordmark" href="index.html" aria-label="Monochrome TCG, inicio"><span class="brand-mark">M</span><span>Monochrome <span class="wordmark-light">TCG</span></span></a>
+    <nav class="shop-nav" aria-label="Navegación principal"><a href="index.html">Inicio</a><a href="tienda.html">Producto</a><a class="cart-count" href="carrito.html">Carrito <span id="header-count">0</span></a><a class="header-login" href="login.html">Mi cuenta <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main class="flow-main">
+    <div class="breadcrumb"><a href="index.html">Inicio</a><span>/</span><a href="carrito.html">Carrito</a><span>/</span><span>Pago</span></div>
+    <section class="flow-heading"><span class="eyebrow">ÚLTIMO PASO</span><h1>Finalizar compra<span class="period">.</span></h1><p>Completa tus datos para confirmar el pedido.</p></section>
+    <div id="checkout-content" class="checkout-grid">
+      <form id="checkout-form" class="checkout-form">
+        <fieldset><legend><span>01</span> Dirección de envío</legend><div class="form-grid"><div class="form-field full-field"><label for="full-name">Nombre completo</label><input id="full-name" name="fullName" autocomplete="name" required></div><div class="form-field full-field"><label for="address">Calle y número</label><input id="address" name="address" autocomplete="street-address" required></div><div class="form-field"><label for="neighborhood">Colonia</label><input id="neighborhood" name="neighborhood" required></div><div class="form-field"><label for="postal-code">Código postal</label><input id="postal-code" name="postalCode" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" required></div><div class="form-field"><label for="city">Ciudad</label><input id="city" name="city" autocomplete="address-level2" required></div><div class="form-field"><label for="state">Estado</label><input id="state" name="state" autocomplete="address-level1" required></div><div class="form-field full-field"><label for="phone">Teléfono de contacto</label><input id="phone" name="phone" type="tel" autocomplete="tel" required></div></div></fieldset>
+        <fieldset><legend><span>02</span> Método de pago</legend><div class="payment-options"><label class="payment-option"><input type="radio" name="payment" value="Tarjeta bancaria (simulada)" required><span><strong>Tarjeta bancaria</strong><small>Simulación de pago, no se solicitarán datos de tarjeta.</small></span><b>▤</b></label><label class="payment-option"><input type="radio" name="payment" value="Transferencia bancaria"><span><strong>Transferencia bancaria</strong><small>Instrucciones de muestra después de confirmar.</small></span><b>↔</b></label><label class="payment-option"><input type="radio" name="payment" value="Pago al recibir"><span><strong>Pago al recibir</strong><small>Opción demostrativa para este proyecto.</small></span><b>⌂</b></label></div></fieldset>
+        <p class="checkout-note">Proyecto demostrativo: no se realiza ningún cobro ni envío real.</p>
+        <button class="button button-dark confirm-button" type="submit">Confirmar compra <span aria-hidden="true">↗</span></button>
+        <p id="checkout-error" class="form-message" role="status" aria-live="polite"></p>
+      </form>
+      <aside class="order-summary checkout-summary"><span class="eyebrow">RESUMEN</span><h2>Tu pedido</h2><div class="summary-product"><img src="img/producto.jpg" alt="Pokémon TCG 30TH Celebration"><div><strong>30TH Celebration Elite Trainer Box</strong><small>Pokémon TCG</small><small id="checkout-quantity">Cantidad: 1</small></div></div><div><span>Subtotal</span><span id="checkout-subtotal"></span></div><div><span>Envío</span><span>Por calcular</span></div><div class="summary-total"><strong>Total</strong><strong id="checkout-total"></strong></div></aside>
+    </div>
+  </main>
+  <footer class="site-footer"><span>MONOCHROME TCG</span><a href="carrito.html">← Volver al carrito</a><span>© 2026</span></footer>
+  <script>
+    const itemCount = Number(sessionStorage.getItem('monochromeCart') || '0');
+    const amount = (1799 * itemCount).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+    document.getElementById('header-count').textContent = itemCount;
+    document.getElementById('checkout-quantity').textContent = `Cantidad: ${itemCount}`;
+    document.getElementById('checkout-subtotal').textContent = `$${amount} MXN`;
+    document.getElementById('checkout-total').textContent = `$${amount} MXN`;
+    document.getElementById('checkout-form').addEventListener('submit', event => {
+      event.preventDefault();
+      if (!sessionStorage.getItem('monochromeUser')) { sessionStorage.setItem('monochromeNext', 'pago.html'); location.href = 'login.html?next=pago.html'; return; }
+      const data = new FormData(event.currentTarget);
+      const order = { id: `MTCG-${Date.now().toString().slice(-7)}`, name: data.get('fullName'), address: `${data.get('address')}, ${data.get('neighborhood')}, ${data.get('city')}, ${data.get('state')}, CP ${data.get('postalCode')}`, payment: data.get('payment'), total: `$${amount} MXN`, quantity: itemCount };
+      sessionStorage.setItem('monochromeLastOrder', JSON.stringify(order));
+      sessionStorage.setItem('monochromeCart', '0');
+      document.getElementById('checkout-content').innerHTML = `<section class="order-confirmation"><span class="confirmation-check">✓</span><span class="eyebrow">PEDIDO CONFIRMADO</span><h2>¡Gracias, ${order.name.replace(/[&<>"']/g, '')}!</h2><p>Tu pedido de demostración quedó registrado.</p><div class="confirmation-details"><div><span>Número de pedido</span><strong>${order.id}</strong></div><div><span>Envío a</span><strong>${order.address.replace(/[&<>"']/g, '')}</strong></div><div><span>Método de pago</span><strong>${order.payment}</strong></div><div><span>Total</span><strong>${order.total}</strong></div></div><p class="checkout-note">No se realizó ningún cobro y el pedido no se enviará.</p><a class="button button-dark" href="index.html">Volver al inicio <span>↗</span></a></section>`;
+    });
+  </script>
+</body>
+</html>
